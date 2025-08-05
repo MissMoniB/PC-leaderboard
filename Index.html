@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Leaderboards 2025 - Detailed Entries</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .leaderboards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .leaderboard {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .leaderboard h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .category-section {
+            margin-bottom: 25px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .category-header {
+            padding: 15px 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .category-header .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .category-content {
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            display: none;
+        }
+
+        .category-content.expanded {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+
+        .entry-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid;
+            transition: all 0.2s ease;
+        }
+
+        .entry-row:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .entry-number {
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 25px;
+            color: #666;
+        }
+
+        .entry-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            padding: 5px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .entry-input:focus {
+            outline: none;
+            border-bottom-color: #667eea;
+        }
+
+        .entry-input::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Color schemes for Home Team categories */
+        .home-team .top-performers .category-header {
+            background: linear-gradient(135deg, #ff6b6b, #e55656);
+        }
+        .home-team .top-performers .entry-row {
+            border-left-color: #ff6b6b;
+        }
+
+        .home-team .category-based .category-header {
+            background: linear-gradient(135deg, #4ecdc4, #45b7b8);
+        }
+        .home-team .category-based .entry-row {
+            border-left-color: #4ecdc4;
+        }
+
+        .home-team .gm-pick .category-header {
+            background: linear-gradient(135deg, #45b7d1, #3498db);
+        }
+        .home-team .gm-pick .entry-row {
+            border-left-color: #45b7d1;
+        }
+
+        .home-team .top-psb .category-header {
+            background: linear-gradient(135deg, #96ceb4, #81c784);
+        }
+        .home-team .top-psb .entry-row {
+            border-left-color: #96ceb4;
+        }
+
+        .home-team .wildcard .category-header {
+            background: linear-gradient(135deg, #feca57, #f39c12);
+        }
+        .home-team .wildcard .entry-row {
+            border-left-color: #feca57;
+        }
+
+        .home-team .top-smart-energy .category-header {
+            background: linear-gradient(135deg, #dda0dd, #ba68c8);
+        }
+        .home-team .top-smart-energy .entry-row {
+            border-left-color: #dda0dd;
+        }
+
+        .home-team .lt-winners .category-header {
+            background: linear-gradient(135deg, #ff9ff3, #e91e63);
+        }
+        .home-team .lt-winners .entry-row {
+            border-left-color: #ff9ff3;
+        }
+
+        /* Color schemes for Partners categories */
+        .partners .leaderboard-cat .category-header {
+            background: linear-gradient(135deg, #6c5ce7, #5b4cdb);
+        }
+        .partners .leaderboard-cat .entry-row {
+            border-left-color: #6c5ce7;
+        }
+
+        .partners .golden-sponsor .category-header {
+            background: linear-gradient(135deg, #fdcb6e, #f39c12);
+        }
+        .partners .golden-sponsor .entry-row {
+            border-left-color: #fdcb6e;
+        }
+
+        .partners .top-mobility .category-header {
+            background: linear-gradient(135deg, #00b894, #00a085);
+        }
+        .partners .top-mobility .entry-row {
+            border-left-color: #00b894;
+        }
+
+        .partners .top-east .category-header {
+            background: linear-gradient(135deg, #e17055, #d63031);
+        }
+        .partners .top-east .entry-row {
+            border-left-color: #e17055;
+        }
+
+        .no-data .category-header {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            opacity: 0.7;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .expand-all-btn, .collapse-all-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin: 0 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .expand-all-btn:hover, .collapse-all-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .leaderboards {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .leaderboard {
+                padding: 20px;
+                max-height: none;
+            }
+        }
+
+        .rotated {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏆 Team Leaderboards 2025</h1>
+        
+        <div class="controls">
+            <button class="expand-all-btn" onclick="expandAll()">📂 Expand All Categories</button>
+            <button class="collapse-all-btn" onclick="collapseAll()">📁 Collapse All Categories</button>
+        </div>
+        
+        <div class="leaderboards">
+            <!-- Home Team Leaderboard -->
+            <div class="leaderboard home-team">
+                <h2>🏠 Home Team 2025</h2>
+                
+                <!-- Top Performers -->
+                <div class="category-section top-performers">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>🏆 Top Performers (10)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">2.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">3.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">4.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">5.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">6.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">7.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">8.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">9.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">10.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                    </div>
+                </div>
+                
+                <!-- Category Based -->
+                <div class="category-section category-based">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>📊 Category Based (5)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">2.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">3.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">4.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">5.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                    </div>
+                </div>
+                
+                <!-- GM Pick -->
+                <div class="category-section gm-pick">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>👨‍💼 GM Pick (11)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">2.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">3.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">4.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">5.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">6.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">7.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">8.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">9.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">10.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">11.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                    </div>
+                </div>
+                
+                <!-- Top PSB -->
+                <div class="category-section top-psb">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>💼 Top PSB (1)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                    </div>
+                </div>
+                
+                <!-- Wildcard -->
+                <div class="category-section wildcard">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>🎄 Wildcard (Xmas winner) (1)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                    </div>
+                </div>
+                
+                <!-- Top Smart Energy -->
+                <div class="category-section top-smart-energy no-data">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>⚡ Top Smart Energy (TBD)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div style="padding: 20px; text-align: center; color: #666; font-style: italic;">
+                            No entries available yet
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- LT Winners -->
+                <div class="category-section lt-winners">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>🎯 LT Winners (5)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">2.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">3.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">4.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                        <div class="entry-row"><span class="entry-number">5.</span><input type="text" class="entry-input" placeholder="Enter technician name..."></div>
+                    </div>
+                </div>
+                
+                <button class="save-btn" onclick="saveData('home-team')">💾 Save Home Team Data</button>
+            </div>
+            
+            <!-- Partners Leaderboard -->
+            <div class="leaderboard partners">
+                <h2>🤝 Partners</h2>
+                
+                <!-- Leaderboard -->
+                <div class="category-section leaderboard-cat">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>📈 Leaderboard (10)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">2.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">3.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">4.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">5.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">6.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">7.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">8.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">9.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">10.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                    </div>
+                </div>
+                
+                <!-- Golden Sponsor Invites -->
+                <div class="category-section golden-sponsor">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>🏅 Golden Sponsor Invites (12)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">2.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">3.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">4.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">5.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">6.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">7.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">8.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">9.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">10.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">11.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                        <div class="entry-row"><span class="entry-number">12.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                    </div>
+                </div>
+                
+                <!-- Top Mobility -->
+                <div class="category-section top-mobility">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>📱 Top Mobility (1)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                    </div>
+                </div>
+                
+                <!-- Top East Performance -->
+                <div class="category-section top-east">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <span>🌅 Top East Performance (1)</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="entry-row"><span class="entry-number">1.</span><input type="text" class="entry-input" placeholder="Enter partner name..."></div>
+                    </div>
+                </div>
+                
+                <button class="save-btn" onclick="saveData('partners')">💾 Save Partners Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCategory(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.textContent = '▼';
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.textContent = '▲';
+                icon.classList.add('rotated');
+            }
+        }
+
+        function expandAll() {
+            const allContents = document.querySelectorAll('.category-content');
+            const allIcons = document.querySelectorAll('.toggle-icon');
+            
+            allContents.forEach(content => {
+                content.classList.add('expanded');
+            });
+            
+            allIcons.forEach(icon => {
+                icon.textContent = '▲';
+                icon.classList.add('rotated');
+            });
+        }
+
+        function collapseAll() {
+            const allContents = document.querySelectorAll('.category-content');
+            const allIcons = document.querySelectorAll('.toggle-icon');
+            
+            allContents.forEach(content => {
+                content.classList.remove('expanded');
+            });
+            
+            allIcons.forEach(icon => {
+                icon.textContent = '▼';
+                icon.classList.remove('rotated');
+            });
+        }
+
+        function saveData(team) {
+            const teamDiv = document.querySelector(`.${team}`);
+            const inputs = teamDiv.querySelectorAll('.entry-input');
+            const data = {};
+            
+            inputs.forEach((input, index) => {
+                const categorySection = input.closest('.category-section');
+                const categoryName = categorySection.className.split(' ')[1];
+                
+                if (!data[categoryName]) {
+                    data[categoryName] = [];
+                }
+                
+                if (input.value.trim()) {
+                    data[categoryName].push(input.value.trim());
+                }
+            });
+            
+            console.log(`${team} data:`, data);
+            
+            // You can implement actual saving logic here
+            alert(`${team === 'home-team' ? 'Home Team' : 'Partners'} data saved! Check console for details.`);
+        }
+
+        // Auto-save functionality
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('entry-input')) {
+                // Auto-save after 2 seconds of no typing
+                clearTimeout(e.target.saveTimeout);
+                e.target.saveTimeout = setTimeout(() => {
+                    console.log('Auto-saving...', e.target.value);
+                }, 2000);
+            }
+        });
+
+        // Load saved data on page load (if any)
+        window.addEventListener('load', function() {
+            // You can implement loading saved data here
+            console.log('Leaderboard loaded and ready for input!');
+        });
+    </script>
+</body>
+</html>
